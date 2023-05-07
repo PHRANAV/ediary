@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>List of Diary Entries</title>
+</head>
+<body>
+    <h1>List of Diary Entries</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="entry : ${entries}">
+                <td th:text="${entry.title}"></td>
+                <td th:text="${entry.date}"></td>
+                <td>
+                    <a th:href="@{/diary-entry/{id}(id=${entry.id})}">Edit</a>
+                    <a th:href="@{/delete-diary-entry/{id}(id=${entry.id})}">Delete</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <a href="/diary-entry">Add New Entry</a>
+</body>
+</html>

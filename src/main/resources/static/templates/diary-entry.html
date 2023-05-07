@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>New Diary Entry</title>
+</head>
+<body>
+    <h1>New Diary Entry</h1>
+    <form th:action="@{/diary-entry}" method="post" th:object="${diaryEntry}">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" th:field="*{title}"/><br/>
+        <label for="content">Content:</label>
+        <textarea id="content" name="content" th:field="*{content}"></textarea><br/>
+        <input type="submit" value="Save"/>
+    </form>
+</body>
+</html>
