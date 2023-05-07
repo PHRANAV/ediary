@@ -1,49 +1,61 @@
+package com.example.diary.controller;
+
+import com.example.diary.model.DiaryEntry;
+import com.example.diary.service.DiaryEntryService;
+import com.example.diary.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.List;
+
 @Controller
+@RequestMapping("/diary")
 public class DiaryController {
 
+    private DiaryEntryService diaryEntryService;
+    private UserService userService;
+
     @Autowired
-    private DiaryEntryRepository diaryEntryRepository;
-
-    @GetMapping("/")
-    public String home(Model model) {
-        return "home";
+    public DiaryController(DiaryEntryService diaryEntryService, UserService userService) {
+        this.diaryEntryService = diaryEntryService;
+        this.userService = userService;
     }
 
-    @GetMapping("/login")
-    public String login(Model model) {
-        return "login";
+    @GetMapping("/list")
+    public String listDiaryEntries(Model model, Principal principal) {
+        String username = principal.getName();
+        List<DiaryEntry> diaryEntries = diaryEntryService.findAllByUsername(username);
+        model.addAttribute("diaryEntries", diaryEntries);
+        return "list-diary-entries";
     }
 
-    @GetMapping("/diary-entries")
-    public String diaryEntries(Model model) {
-        List<DiaryEntry> entries = diaryEntryRepository.findAll();
-        model.addAttribute("entries", entries);
-        return "diary-entries";
-    }
-
-    @GetMapping("/diary-entry")
-    public String diaryEntryForm(Model model) {
+    @GetMapping("/add")
+    public String addDiaryEntry(Model model) {
         model.addAttribute("diaryEntry", new DiaryEntry());
         return "diary-entry";
     }
 
-    @GetMapping("/diary-entry/{id}")
-    public String editDiaryEntryForm(@PathVariable Long id, Model model) {
-        DiaryEntry entry = diaryEntryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid entry id: " + id));
-        model.addAttribute("diaryEntry", entry);
+    @PostMapping("/save")
+    public String saveDiaryEntry(@ModelAttribute DiaryEntry diaryEntry, Principal principal) {
+        String username = principal.getName();
+        diaryEntry.setUsername(username);
+        diaryEntryService.save(diaryEntry);
+        return "redirect:/diary/list";
+    }
+
+    @GetMapping("/update/{id}")
+    public String updateDiaryEntry(@PathVariable Long id, Model model) {
+        DiaryEntry diaryEntry = diaryEntryService.findById(id);
+        model.addAttribute("diaryEntry", diaryEntry);
         return "diary-entry";
     }
 
-    @PostMapping("/diary-entry")
-    public String saveDiaryEntry(@ModelAttribute("diaryEntry") DiaryEntry entry) {
-        diaryEntryRepository.save(entry);
-        return "redirect:/diary-entries";
-    }
-
-    @GetMapping("/delete-diary-entry/{id}")
+    @GetMapping("/delete/{id}")
     public String deleteDiaryEntry(@PathVariable Long id) {
-        DiaryEntry entry = diaryEntryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid entry id: " + id));
-        diaryEntryRepository.delete(entry);
-        return "redirect:/diary-entries";
+        diaryEntryService.deleteById(id);
+        return "redirect:/diary/list";
     }
 }

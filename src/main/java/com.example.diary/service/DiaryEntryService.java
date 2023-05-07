@@ -1,32 +1,42 @@
 package com.example.diary.service;
 
-import com.example.diary.model.DiaryEntry;
-import com.example.diary.repository.DiaryEntryRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.example.diary.model.DiaryEntry;
+import com.example.diary.repository.DiaryEntryRepository;
 
 @Service
 public class DiaryEntryService {
 
-    @Autowired
     private DiaryEntryRepository diaryEntryRepository;
 
-    public List<DiaryEntry> getAllDiaryEntries() {
+    @Autowired
+    public DiaryEntryService(DiaryEntryRepository diaryEntryRepository) {
+        this.diaryEntryRepository = diaryEntryRepository;
+    }
+
+    public List<DiaryEntry> getAllEntries() {
         return diaryEntryRepository.findAll();
     }
 
-    public DiaryEntry getDiaryEntryById(Long id) {
-        return diaryEntryRepository.findById(id).orElse(null);
+    public Optional<DiaryEntry> getEntryById(Long id) {
+        return diaryEntryRepository.findById(id);
     }
 
-    public DiaryEntry saveDiaryEntry(DiaryEntry diaryEntry) {
-        return diaryEntryRepository.save(diaryEntry);
+    public DiaryEntry saveEntry(DiaryEntry entry) {
+        return diaryEntryRepository.save(entry);
     }
 
-    public void deleteDiaryEntry(Long id) {
+    public void deleteEntryById(Long id) {
         diaryEntryRepository.deleteById(id);
+    }
+
+    public List<DiaryEntry> getAllEntriesByUserId(Long userId) {
+        return diaryEntryRepository.findByUserId(userId);
     }
 
 }
